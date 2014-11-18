@@ -32,14 +32,18 @@ public class FlightService {
 	// query parameter "fp" specifies which FlightProvider to use, its value is
 	// one of FlightProviderEnum
 	private final static String QUERY_PARAM_FLIGHT_PROVIDER = "fp";
-	
-	// list of supported flight providers; right now, only a JCo flight provider is available, later on  this might 
+
+	// list of supported flight providers; right now, only a JCo flight provider
+	// is available, later on this might
 	// be extended to e.g. also offer an odata flight provider
 	private enum FlightProviderEnum {
 		jco
 	};
-	
-	/** mapping between airport cities to countries; for now, this list is hard coded */
+
+	/**
+	 * mapping between airport cities to countries; for now, this list is hard
+	 * coded
+	 */
 	private static HashMap<String, String> countries;
 	static {
 		countries = new HashMap<String, String>();
@@ -51,7 +55,7 @@ public class FlightService {
 		countries.put("SINGAPORE", "SG");
 		countries.put("TOKYO", "JP");
 	}
-	
+
 	@GET
 	@Path("/cities")
 	@Produces("application/json")
@@ -67,22 +71,22 @@ public class FlightService {
 			citiesList.append("},");
 		}
 		int length = citiesList.length();
-		if (length>1) citiesList.setLength(length-1);
-		citiesList.append("]}");		
-		return citiesList.toString();  
+		if (length > 1)
+			citiesList.setLength(length - 1);
+		citiesList.append("]}");
+		return citiesList.toString();
 	}
 
-		@GET
-		@Path("/flights/{cityFrom}/{cityTo}")
-		@Produces("application/json")
-		/**
-		 * Returns the flight list.
-		 * 
-		 * @param req The {@link HttpServletRequest} that is processed
-		 * @return the flight list as json string
-		 */
-		public String getFlightList(@Context HttpServletRequest req, @PathParam("cityFrom") String cityFrom,
-				@PathParam("cityTo") String cityTo) {
+	@GET
+	@Path("/flights/{cityFrom}/{cityTo}")
+	@Produces("application/json")
+	/**
+	 * Returns the flight list.
+	 * 
+	 * @param req The {@link HttpServletRequest} that is processed
+	 * @return the flight list as json string
+	 */
+	public String getFlightList(@Context HttpServletRequest req, @PathParam("cityFrom") String cityFrom, @PathParam("cityTo") String cityTo) {
 		FlightProvider flightProvider = getFlightProvider(req);
 		String flightList = flightProvider.getFlightList(cityFrom, cityTo);
 		return flightList;
@@ -103,13 +107,13 @@ public class FlightService {
 	@Consumes("application/x-www-form-urlencoded")
 	@Produces("application/json")
 	public String createFlighBooking(@Context HttpServletRequest req, @FormParam("carrier") String carrier,
-			@FormParam("connNumber") String connNumber, @FormParam("dateOfFlight") String dateOfFlight) {		
+			@FormParam("connNumber") String connNumber, @FormParam("dateOfFlight") String dateOfFlight) {
 		FlightProvider flightProvider = getFlightProvider(req);
 		String bookId = flightProvider.bookFlight(carrier, connNumber, dateOfFlight);
 		String resultJson = "{\"bookid\":\"" + bookId + "\"}";
-		return resultJson;		
+		return resultJson;
 	}
-	
+
 	/**
 	 * Read flight provider type from "fp" query parameter and return related
 	 * <code>FlightProvider</code> implementation class. If query parameter is

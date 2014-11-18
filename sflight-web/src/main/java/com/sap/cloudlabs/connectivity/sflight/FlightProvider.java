@@ -7,9 +7,9 @@ package com.sap.cloudlabs.connectivity.sflight;
  */
 public interface FlightProvider {
 		
-	public String getFlightList(String cityFrom, String cityTo);
+	public String getFlightList(String cityFrom, String cityTo) throws ConnectivityException;
 	
-	public String bookFlight(String carrier, String connectionNumber, String date);
+	public String bookFlight(String carrier, String connectionNumber, String date) throws ConnectivityException;
 
-	public String getFlightDetails(String carrier, String connectionNumber, String date);
+	public String getFlightDetails(String carrier, String connectionNumber, String date) throws ConnectivityException;
 }

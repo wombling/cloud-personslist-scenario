@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import javax.servlet.http.HttpServlet;
 
+import com.sap.cloudlabs.connectivity.sflight.ConnectivityException;
 import com.sap.cloudlabs.connectivity.sflight.FlightProvider;
 import com.sap.conn.jco.JCoContext;
 import com.sap.conn.jco.JCoDestination;
@@ -12,7 +13,6 @@ import com.sap.conn.jco.JCoException;
 import com.sap.conn.jco.JCoFunction;
 import com.sap.conn.jco.JCoParameterList;
 import com.sap.conn.jco.JCoStructure;
-
 
 /**
  * The class is a <code>FlightProvider</code> implementation that uses JCo for
@@ -72,9 +72,9 @@ public class JCoFlightProvider extends HttpServlet implements FlightProvider {
 	 * com.sap.cloudlabs.connectivity.sflight.FlightProvider#getFlightList(java
 	 * .lang.String, java.lang.String)
 	 */
-	public String getFlightList(String cityFrom, String cityTo) {
+	public String getFlightList(String cityFrom, String cityTo) throws ConnectivityException {
 
-		try {			
+		try {
 			JCoDestination destination = JCoDestinationManager.getDestination(SFLIGHT_DESTINATION);
 			JCoFunction bapiSflightGetList = destination.getRepository().getFunction(BAPI_SFLIGHT_GETLIST);
 
@@ -91,12 +91,13 @@ public class JCoFlightProvider extends HttpServlet implements FlightProvider {
 			}
 
 			bapiSflightGetList.execute(destination);
-			
+
 			return bapiSflightGetList.getTableParameterList().toJSON();
 
 		} catch (JCoException e) {
-			throw new RuntimeException(e);
+			throw new ConnectivityException("something went wrong somewhere:" + e.getMessageText());
 		}
+
 	}
 
 	/*
