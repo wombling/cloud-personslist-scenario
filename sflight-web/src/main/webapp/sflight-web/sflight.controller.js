@@ -24,56 +24,23 @@ sap.ui.controller("sflight-web.sflight",
 	},
 
 	/**
-	 * Search flights.
+	 * Search flights. 	
 	 */
 	searchFlights : function(cityFrom, cityTo, showMessage) {
 		var oJsonModel = new sap.ui.model.json.JSONModel(null);
-		/**
-		 * break apart into an asynchronous request that can handle errors!
-		 * oJsonModel.loadData(this.getFlightServiceURL() + "/flights/" +
-		 * cityFrom + "/" + cityTo, null, false);
-		 */				
-		$.ajax({
-			url : this.getFlightServiceURL() + "/flights/" + cityFrom + "/" + cityTo,
-			type : "GET",
-			xhrFields : {
-				withCredentials : true
-			},
-			dataType : "json",
-			async : true,
-			success : $.proxy(showFlights, this),
-			error : $.proxy(showError, this)
-		});
-		function showError(xhr, ajaxOptions, thrownError) {
-			switch (xhr.status) {
-			case 404:
+		oJsonModel.loadData(this.getFlightServiceURL() + "/flights/" + cityFrom + "/" + cityTo, null, false);
+		var oTable = this.getView().getFlightTable();
+		oTable.setModel(oJsonModel);							
+		oTable.bindRows("/FLIGHTLIST");	
+		if (showMessage) {						
+			if (oJsonModel.oData.FLIGHTLIST) {
+				this.showMsgArea("info", oJsonModel.oData.FLIGHTLIST.length + " flights from " + cityFrom + " to " + cityTo + " loaded.");
+			} else {
 				this.showMsgArea("info", "No flights available from " + cityFrom + " to " + cityTo + ".");
-				break;
-				
-			case 500:
-				this.showMsgArea("error", "An error in connecting to the SAP backend occured, try again later.");
-				break;
-
-			default:
-				this.showMsgArea("error", xhr.statusText); 
-			break;
-			}
-
-		}
-
-		function showFlights() {
-			var oTable = this.getView().getFlightTable();
-			oTable.setModel(oJsonModel);							
-			oTable.bindRows("/FLIGHTLIST");	
-			if (showMessage) {						
-				if (oJsonModel.oData.FLIGHTLIST) {
-					this.showMsgArea("info", oJsonModel.oData.FLIGHTLIST.length + " flights from " + cityFrom + " to " + cityTo + " loaded.");
-				} else {
-					this.showMsgArea("info", "No flights available from " + cityFrom + " to " + cityTo + ".");
-				}
 			}
 		}
 	},
+	
 
 	/**
 	 * Read flight details.
